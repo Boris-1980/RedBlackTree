@@ -114,12 +114,13 @@ class LeftLeaningRedBlackTree:
         print(f"Меняем цвета узлов для узла {node.key}")
         self._print_tree()
 
-def _print_tree(self):
-    # Рекурсивный обход дерева для вывода элементов в консоль
-    def print_node(node, level=0):
-        if node is not None:
-            print_node(node.right, level + 1)
-            print("   " * level + f"{node.key} ({node.color})")
-            print_node(node.left, level + 1)  # добавляем рекурсивный вызов для левого поддерева
-    print_node(self.root)  # вызываем рекурсивную функцию с корневым узлом
+    def _print_tree(self):
+    # Рекурсивно выводим дерево в консоль
+        def traverse(node, level=0):
+            if node is not None:
+                traverse(node.left, level + 1)
+                print(f"Level {level}: {node.key} ({node.color})")
+                traverse(node.right, level + 1)
 
+        print("\n")
+        traverse(self.root)
