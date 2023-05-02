@@ -57,20 +57,36 @@ class Node:
             if self.right:
             self.right.print_tree()
     
-    def insert(self, val):
-        if self.data == val:
+    def insert(self, data):
+    new_node = Node(data)
+
+    # Perform BST insertion
+    if self.root is None:
+        # Case 1: Empty tree
+        self.root = new_node
+        self.root.color = Node.BLACK
         return
-        if self.data > val:
-            if self.left:
-            self.left.insert(val)
+    else:
+        # Find the insertion point
+        parent = None
+        current = self.root
+        while current is not None:
+            parent = current
+            if new_node.data < current.data:
+                current = current.left
             else:
-            self.left = Node(val, self)
-            else:
-                if self.right:
-            self.right.insert(val)
+                current = current.right
+
+        # Insert the new node
+        new_node.parent = parent
+        if new_node.data < parent.data:
+            parent.left = new_node
         else:
-            self.right = Node(val, self)
-        self.fix_violation()
+            parent.right = new_node
+
+    # Fix the tree
+    self.fix_insert(new_node)
+
 
     def fix_violation(self):
     while self.parent and self.parent.color == 1:
@@ -123,6 +139,45 @@ class Node:
                 self.parent.right = new_root
                 new_root.left = self
                 self.parent = new_root
+
+
+    def fix_insert(self, node):
+    while node.parent is not None and node.parent.color == RED:
+        if node.parent == node.parent.parent.left:
+            uncle = node.parent.parent.right
+            if uncle is not None and uncle.color == RED:
+                # Case 1: Parent and uncle are both red
+                node.parent.color = BLACK
+                uncle.color = BLACK
+                node.parent.parent.color = RED
+                node = node.parent.parent
+            else:
+                if node == node.parent.right:
+                    # Case 2: Parent is red and uncle is black, and node is a right child
+                    node = node.parent
+                    self.rotate_left(node)
+                # Case 3: Parent is red and uncle is black, and node is a left child
+                node.parent.color = BLACK
+                node.parent.parent.color = RED
+                self.rotate_right(node.parent.parent)
+        else:
+            uncle = node.parent.parent.left
+            if uncle is not None and uncle.color == RED:
+                # Case 4: Parent and uncle are both red, and node is a right child
+                node.parent.color = BLACK
+                uncle.color = BLACK
+                node.parent.parent.color = RED
+                node = node.parent.parent
+            else:
+                if node == node.parent.left:
+                    # Case 5: Parent is red and uncle is black, and node is a left child
+                    node = node.parent
+                    self.rotate_right(node)
+                # Case 6: Parent is red and uncle is black, and node is a right child
+                node.parent.color = BLACK
+                node.parent.parent.color = RED
+                self.rotate_left(node.parent.parent)
+    self.root.color = BLACK
 
 def right_rotate(self):
     new_root = self.left
