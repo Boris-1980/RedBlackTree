@@ -34,7 +34,6 @@
 # root.print_tree()
 
 class RedBlackNode:
-
     def __init__(self, key, color='RED'):
         self.key = key
         self.color = color
@@ -44,45 +43,42 @@ class RedBlackNode:
 
 class RedBlackTree:
     def __init__(self):
-        self.nil = RedBlackNode(None, 'BLACK')
+        self.nil = Node(0)
+        self.nil.color = 'BLACK'
         self.root = self.nil
 
-    def insert(self, key):
-        """
-        Вставляет новый узел в красно-черное дерево с заданным ключом
-        """
-        # Создаем новый узел
-        new_node = RedBlackNode(key)
 
-        # Устанавливаем его потомком равным nil
+    def insert(self, key):
+
+        new_node = Node(key)
         new_node.left = self.nil
         new_node.right = self.nil
+        new_node.color = 'RED'
 
-        # Устанавливаем корень как родитель нового узла
-        new_node.parent = self.root
-        # Ищем место для вставки нового узла
-        current = self.root
         parent = None
-        while current != self.nil:
-            parent = current
-            if key < current.key:
-                current = current.left
-            else:
-                current = current.right
+        current = self.root
 
-        # Устанавливаем родителя нового узла
-        new_node.parent = parent
-
-        # Вставляем новый узел в дерево
-        if parent == None:
-            self.root = new_node
-        elif key < parent.key:
-            parent.left = new_node
+    # Ищем место для вставки нового узла
+    while current != self.nil:
+        parent = current
+        if new_node.key < current.key:
+            current = current.left
         else:
-            parent.right = new_node
+            current = current.right
 
-        # Балансируем дерево
-        self.__fix_insert(new_node)
+    # Вставляем новый узел на место найденного листа
+    new_node.parent = parent
+    if parent == None:
+        self.root = new_node
+        new_node.color = 'BLACK'  # Новый узел является корнем дерева, устанавливаем его цвет в черный
+    elif new_node.key < parent.key:
+        parent.left = new_node
+    else:
+        parent.right = new_node
+
+    # Фиксируем изменения в дереве
+    self.__fix_insert(new_node)
+
 
     def __fix_insert(self, new_node):
         """
@@ -293,6 +289,5 @@ rbt.delete(20)
 print("Элементы дерева в отсортированном порядке: ", end="")
 rbt.inorder_traversal(rbt.root)
 print()
-
 
     
