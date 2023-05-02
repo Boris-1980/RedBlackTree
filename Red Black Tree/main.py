@@ -33,94 +33,128 @@
 
 # root.print_tree()
 
-# node = root.search(11)
-# if node:
-#     print(True)
-# else:
-#     print(False)
+class Node: 
 
-class LeftLeaningRedBlackTree:
-    class Node:
-        def __init__(self, key, value):
-            self.key = key
-            self.value = value
-            self.left = None
-            self.right = None
-            self.color = "RED"
+    def __init__(self, data, parent=None):
+        self.data = data
+        self.left = None
+        self.right = None
+        self.parent = parent
+        self.color = 1
 
-    def __init__(self):
-        self.root = None
+    def search(self, val):
+        if self.data == val:
+            return self
+        if self.data > val:
+            return self.left.search(val) if self.left else None
+        else:
+            return self.right.search(val) if self.right else None
 
-    def add(self, key, value):
-        self.root = self._add(self.root, key, value)
-        self.root.color = "BLACK"
+    def print_tree(self):
+            if self.left:
+            self.left.print_tree()
+            print(self.data)
+            if self.right:
+            self.right.print_tree()
+    
+    def insert(self, val):
+        if self.data == val:
+        return
+        if self.data > val:
+            if self.left:
+            self.left.insert(val)
+            else:
+            self.left = Node(val, self)
+            else:
+                if self.right:
+            self.right.insert(val)
+        else:
+            self.right = Node(val, self)
+        self.fix_violation()
 
-    def _add(self, node, key, value):
-        # Если узел пустой, создаем новый узел с заданным ключом и значением
-        if node is None:
-            return self.Node(key, value)
+    def fix_violation(self):
+    while self.parent and self.parent.color == 1:
+        if self.parent == self.parent.parent.left:
+            uncle = self.parent.parent.right
 
-        # Если ключ меньше, чем ключ текущего узла, рекурсивно добавляем элемент в левое поддерево
-        if key < node.key:
-            node.left = self._add(node.left, key, value)
+            if uncle and uncle.color == 1:
+                self.parent.color = 0
+                uncle.color = 0
+                self.parent.parent.color = 1
+                self = self.parent.parent
+            else:
+                if self == self.parent.right:
+                    self = self.parent
+                    self.left_rotate()
+                self.parent.color = 0
+                self.parent.parent.color = 1
+                self.parent.parent.right_rotate()
+        else:
+            uncle = self.parent.parent.left
 
-        # Если ключ больше, чем ключ текущего узла, рекурсивно добавляем элемент в правое поддерево
-        elif key > node.key:
-            node.right = self._add(node.right, key, value)
+            if uncle and uncle.color == 1:
+                self.parent.color = 0
+                uncle.color = 0
+                self.parent.parent.color = 1
+                self = self.parent.parent
+            else:
+                if self == self.parent.left:
+                    self = self.parent
+                    self.right_rotate()
+                self.parent.color = 0
+                self.parent.parent.color = 1
+                self.parent.parent.left_rotate()
 
-        # Проверяем баланс и перебалансируем дерево, если необходимо
-        if self._is_red(node.right) and not self._is_red(node.left):
-            node = self._rotate_left(node)
-        if self._is_red(node.left) and self._is_red(node.left.left):
-            node = self._rotate_right(node)
-        if self._is_red(node.left) and self._is_red(node.right):
-            self._flip_colors(node)
+    self.color = 0
+    while self.parent:
+        self = self.parent
 
-        return node
+        def left_rotate(self):
+            new_root = self.right
+            self.right = new_root.left
+            if new_root.left:
+                new_root.left.parent = self
+                new_root.parent = self.parent
+            if not self.parent:
+                root = new_root
+            elif self == self.parent.left:
+                self.parent.left = new_root
+            else:
+                self.parent.right = new_root
+                new_root.left = self
+                self.parent = new_root
 
-    def _is_red(self, node):
-        # Проверяем, является ли цвет узла красным
-        if node is None:
-            return False
-        return node.color == "RED"
+def right_rotate(self):
+    new_root = self.left
+    self.left = new_root.right
+    if new_root.right:
+        new_root.right.parent = self
+        new_root.parent = self.parent
+    if not self.parent:
+        root = new_root
+    elif self == self.parent.right:
+        self.parent.right = new_root
+    else:
+        self.parent.left = new_root
+        new_root.right = self
+        self.parent = new_root
 
-    def _rotate_left(self, node):
-        # Выполняем левый поворот
-        x = node.right
-        node.right = x.left
-        x.left = node
-        x.color = node.color
-        node.color = "RED"
-        print(f"Выполняем левый поворот узла {node.key}")
-        self._print_tree()
-        return x
+root = Node(10)
+root.left = Node(5)
+root.right = Node(15)
+root.left.left = Node(3)
+root.left.right = Node(8)
+root.right.left = Node(12)
+root.right.right = Node(20)
 
-    def _rotate_right(self, node):
-        # Выполняем правый поворот
-        x = node.left
-        node.left = x.right
-        x.right = node
-        x.color = node.color
-        node.color = "RED"
-        print(f"Выполняем правый поворот узла {node.key}")
-        self._print_tree()
-        return x
+root.print_tree()
 
-    def _flip_colors(self, node):
-        # Меняем цвета узлов
-        node.color = "RED"
-        node.left.color = "BLACK"
-        node.right.color = "BLACK"
-        print(f"Меняем цвета узлов для узла {node.key}")
-        self._print_tree()
+root.insert(9)
+root.insert(7)
+root.insert(13)
+root.insert(18)
 
-    def _print_tree(self):
-    # Рекурсивно выводим дерево в консоль
-        def traverse(node, level=0):
-            if node is not None:
-                traverse(node.left, level + 1)
-                print(f"Level {level}: {node.key} ({node.color})")
-                traverse(node.right, level + 1)
+root.print_tree()
 
-        print("\n")
-        traverse(self.root)
+
+    
